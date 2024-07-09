@@ -1,5 +1,9 @@
 package com.ecom.jwtservice.controller;
 
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,25 +14,33 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ecom.jwtservice.security.JWTUtil;
 
 @RestController
-@RequestMapping("/jwt-service")
+@RequestMapping("/ecom/api")
 public class JwtController {
+	
+	private final Logger log = LogManager.getLogger(JwtController.class);
 
 	@Autowired
 	JWTUtil jwtUtil;
-	@PostMapping("/api/tokens")
+
+	@PostMapping("/generatetoken")
 	public String generateToken(String email, String role) {
-		System.out.println(email  + role);
-	String jwtToken=jwtUtil.generateToken(email, role);
-	System.out.println(jwtToken);
+		log.info("Generating the token...!");
+		String jwtToken = jwtUtil.generateToken(email, role);
 		return jwtToken;
-		
+
 	}
-	
-	@GetMapping("/api/token/validate")
+
+	@GetMapping("/validatetoken")
 	public String validateToken(@RequestParam("token") String token) {
-		System.out.println(token);
-		String email= jwtUtil.validateTokenAndRetrieveSubject(token);
-		System.out.println(email);
+		log.info("Validating the token...!");
+		String email = jwtUtil.validateTokenAndRetrieveSubject(token);
 		return email;
+	}
+
+	@GetMapping("/token/getrole")
+	public List<String> getRolesFromToken(@RequestParam("token") String token) {
+		log.info("Extracting the role from the token...!");
+		List<String> roles = jwtUtil.getRolesFromToken(token);
+		return roles;
 	}
 }
